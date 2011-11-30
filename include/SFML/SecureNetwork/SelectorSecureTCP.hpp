@@ -1,0 +1,7 @@
+
+
+class SelectorSecureTCP : public SelectorTCP {
+
+
+
+}
