@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
             if (selector.IsReady(listener))
               {
                 // The listener is ready: there is a pending connection
+                // Use an AES-256 cipher for encrypting the data
                 SecureTcpSocket* client = new SecureTcpSocket(new AESCipher(32));
                 if (listener.Accept(*client) == Socket::Done)
                   {

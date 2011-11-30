@@ -10,9 +10,11 @@ namespace sf {
 
 Socket::Status SecureTcpSocket::Connect(const IpAddress& HostAddress, short unsigned int Port, Uint32 timeout) {
 
-  if(TcpSocket::Connect(HostAddress, Port, timeout) == sf::Socket::Done) {
-        InitClientSide();
-    }
+  Socket::Status s = TcpSocket::Connect(HostAddress, Port, timeout);
+  if(s == sf::Socket::Done)
+      InitClientSide();
+
+  return s;
 
 }
 
