@@ -4,9 +4,9 @@
 #include <SFML/Network.hpp>
 #include "SecureTcpSocket.hpp"
 
-namespace sf {
+namespace ssf {
 
-class SecureTcpListener : public TcpListener {
+  class SecureTcpListener : public sf::TcpListener {
 
 public:
  
@@ -14,6 +14,6 @@ public:
 
 };
 
-} // namespace sf
+} // namespace ssf
 
 #endif

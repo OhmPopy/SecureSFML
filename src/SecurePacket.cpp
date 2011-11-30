@@ -1,7 +1,7 @@
-#include "SFML/SecureNetwork/SecurePacket.hpp"
+#include "SecureSFML/SecureNetwork/SecurePacket.hpp"
 #include <string.h>
 
-namespace sf {
+namespace ssf {
 
 const char* SecurePacket::OnSend(std::size_t& DataSize) {
     char* myBuffer = new char[GetDataSize()];
@@ -22,4 +22,4 @@ void SecurePacket::OnReceive(const char* Data, std::size_t DataSize) {
     Append(decryptedBuffer, DataSize);
 }
 
-} // namespace sf
+} // namespace ssf

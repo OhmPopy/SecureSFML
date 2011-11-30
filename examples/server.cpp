@@ -1,9 +1,10 @@
-#include "SFML/SecureNetwork.hpp"
+#include "SecureSFML/SecureNetwork.hpp"
 #include <iostream>
 #include <list>
 
 using namespace std;
 using namespace sf;
+using namespace ssf;
 
 int main(int argc, char* argv[]) {
     SecureTcpListener listener;

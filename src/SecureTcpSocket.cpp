@@ -1,17 +1,18 @@
-#include "SFML/SecureNetwork/SecureTcpSocket.hpp"
-#include "SFML/SecureNetwork/RC4Cipher.hpp"
-#include "SFML/SecureNetwork/AESCipher.hpp"
+#include "SecureSFML/SecureNetwork/SecureTcpSocket.hpp"
+#include "SecureSFML/SecureNetwork/RC4Cipher.hpp"
+#include "SecureSFML/SecureNetwork/AESCipher.hpp"
 #include <iostream>
 #include <string.h>
 
 using namespace std;
+using namespace sf;
 
-namespace sf {
+namespace ssf {
 
-Socket::Status SecureTcpSocket::Connect(const IpAddress& HostAddress, short unsigned int Port, Uint32 timeout) {
+  Socket::Status SecureTcpSocket::Connect(const IpAddress& HostAddress, short unsigned int Port, Uint32 timeout) {
 
   Socket::Status s = TcpSocket::Connect(HostAddress, Port, timeout);
-  if(s == sf::Socket::Done)
+  if(s == Socket::Done)
       InitClientSide();
 
   return s;
@@ -153,4 +154,4 @@ SecurePacket SecureTcpSocket::getNewSecurePacket() {
   return SecurePacket(myCipher);
 }
 
-} // namespace sf
+} // namespace ssf

@@ -3,7 +3,7 @@
 
 #include <openssl/rand.h>
 
-namespace sf {
+namespace ssf {
 
 enum CipherType {
   CIPHER_RC4 = 0,
@@ -69,6 +69,6 @@ public:
 
 };
 
-}
+} // namespace ssf
 
 #endif

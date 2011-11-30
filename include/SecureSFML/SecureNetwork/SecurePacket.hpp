@@ -4,12 +4,12 @@
 #include <SFML/Network.hpp>
 #include "Cipher.hpp"
 
-namespace sf {
+namespace ssf {
 
 /**
  * A secure packet, whose data will be encrypted using a stream cipher
  */
-class SecurePacket : public Packet {
+  class SecurePacket : public sf::Packet {
 
 public:
 
@@ -27,6 +27,6 @@ private:
 
 };
 
-} // namespace sf
+} // namespace ssf
 
 #endif

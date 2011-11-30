@@ -4,7 +4,7 @@
 #include "Cipher.hpp"
 #include <iostream>
 
-namespace sf {
+namespace ssf {
 
 class AESCipher : public Cipher {
 
@@ -45,6 +45,6 @@ private:
 
 };
 
-}
+} // namespace ssf
 
 #endif

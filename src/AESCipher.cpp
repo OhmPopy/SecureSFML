@@ -1,7 +1,7 @@
-#include "SFML/SecureNetwork/AESCipher.hpp"
+#include "SecureSFML/SecureNetwork/AESCipher.hpp"
 #include <openssl/aes.h>
 
-namespace sf {
+namespace ssf {
 
 char* AESCipher::encrypt(const char* Data, int& length) {
   AES_KEY encryptKey;
@@ -35,4 +35,4 @@ char* AESCipher::decrypt(const char* Data, int length) {
   return reinterpret_cast<char*>(decrypted);
 }
 
-} // namespace sf
+} // namespace ssf

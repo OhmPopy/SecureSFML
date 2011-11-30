@@ -1,6 +1,8 @@
-#include "SFML/SecureNetwork/SecureTcpListener.hpp"
+#include "SecureSFML/SecureNetwork/SecureTcpListener.hpp"
 
-namespace sf {
+using namespace sf;
+
+namespace ssf {
 
 Socket::Status SecureTcpListener::Accept(SecureTcpSocket& Connected) {
   Socket::Status s = TcpListener::Accept(Connected);
@@ -10,4 +12,4 @@ Socket::Status SecureTcpListener::Accept(SecureTcpSocket& Connected) {
   return s;
 }
 
-} // namespace sf
+} // namespace ssf

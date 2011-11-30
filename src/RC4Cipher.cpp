@@ -1,7 +1,7 @@
-#include "SFML/SecureNetwork/RC4Cipher.hpp"
+#include "SecureSFML/SecureNetwork/RC4Cipher.hpp"
 #include <openssl/rc4.h>
 
-namespace sf {
+namespace ssf {
 
 char* RC4Cipher::encrypt(const char* Data, int& length) {
 
@@ -18,4 +18,4 @@ char* RC4Cipher::decrypt(const char* Data, int length) {
     return encrypt(Data, length);
 }
 
-} // namespace sf
+} // namespace ssf

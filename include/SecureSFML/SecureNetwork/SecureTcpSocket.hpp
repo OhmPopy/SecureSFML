@@ -6,7 +6,7 @@
 #include "Cipher.hpp"
 #include "SecurePacket.hpp"
 
-namespace sf {
+namespace ssf {
 
   /**
    * A secure TCP socket that uses encryption for data transfers. Currently supported modes : 
@@ -16,7 +16,7 @@ namespace sf {
    * Please take care to check the law in your country for maximum allowed key size.
    */
 
-class SecureTcpSocket : public TcpSocket {
+  class SecureTcpSocket : public sf::TcpSocket {
 
 public:
 
@@ -37,7 +37,7 @@ public:
 
     }
     
-  Socket::Status Connect(const IpAddress& HostAddress, short unsigned int Port, Uint32 timeout = 0);
+    sf::Socket::Status Connect(const sf::IpAddress& HostAddress, short unsigned int Port, sf::Uint32 timeout = 0);
 
     /**
      * Creates a new secure packet that will use the cipher of this secure socket for encryption/decryption
@@ -51,12 +51,12 @@ private:
     RSA* keyPair;
     Cipher* myCipher;
 
-    BIGNUM* receiveBigNum(int sixtyFourBits, Packet& data);
+    BIGNUM* receiveBigNum(int sixtyFourBits, sf::Packet& data);
     void InitServerSide();
     void InitClientSide();
 
 };
 
-} // namespace sf
+} // namespace ssf
 
 #endif

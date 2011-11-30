@@ -3,7 +3,7 @@
 
 #include "Cipher.hpp"
 
-namespace sf {
+namespace ssf {
 
 class RC4Cipher : public Cipher {
 
@@ -38,6 +38,6 @@ public:
 
 };
 
-}
+} // namespace ssf
 
 #endif
