@@ -23,7 +23,7 @@ public:
     /**
      * Initializes a SecureTcpSocket object.
      * @param cipher the cipher to be used. This parameter should be set only server-side.
-     * Server-side : defaults is an RC4 cipher with 128b random key
+     * Server-side : default is an RC4 cipher with 128b random key
      */
     SecureTcpSocket(Cipher* cipher = 0) : keyPair(0), myCipher(cipher) { }
     
