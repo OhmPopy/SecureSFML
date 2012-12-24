@@ -9,9 +9,9 @@ using namespace sf;
 
 namespace ssf {
 
-  Socket::Status SecureTcpSocket::Connect(const IpAddress& HostAddress, short unsigned int Port, Uint32 timeout) {
+Socket::Status SecureTcpSocket::connect(const IpAddress& HostAddress, short unsigned int Port, sf::Time timeout) {
 
-  Socket::Status s = TcpSocket::Connect(HostAddress, Port, timeout);
+  Socket::Status s = TcpSocket::connect(HostAddress, Port, timeout);
   if(s == Socket::Done)
       InitClientSide();
 
@@ -60,7 +60,7 @@ void SecureTcpSocket::InitServerSide() {
         myCipher = new RC4Cipher;
 
     Packet data;
-    Receive(data);
+    receive(data);
 
     int sixtyFourBits;
 
@@ -78,13 +78,13 @@ void SecureTcpSocket::InitServerSide() {
 
     keyToSend << myCipher->getKeyLength();
     keyToSend << (int)myCipher->getCipherType();
-    keyToSend.Append(cryptedCipherKey, RSA_size(keyPair));
+    keyToSend.append(cryptedCipherKey, RSA_size(keyPair));
     
-    Send(keyToSend);
+    send(keyToSend);
 }
 
 void SecureTcpSocket::InitClientSide() {
-    keyPair = RSA_generate_key(2048, 17, 0, 0);
+    keyPair = RSA_generate_key(2048, 65537, 0, 0);
 
     if(myCipher)
       delete myCipher;
@@ -118,21 +118,24 @@ void SecureTcpSocket::InitClientSide() {
         #endif
         data << static_cast<unsigned int>(keyPair->e->d[i]);
     }
-    Send(data);
+    
+    send(data);
 
     sf::Packet keyToReceive;
     int keyLength;
     int cipherType;
 
-    Receive(keyToReceive);
+    receive(keyToReceive);
 
     keyToReceive >> keyLength;
     keyToReceive >> cipherType;
 
     unsigned char* cryptedKey = new unsigned char[256];
     unsigned char* key = new unsigned char[keyLength];
+    
+    const char* keyToReceiveData = (const char*)keyToReceive.getData();
 
-    memcpy(cryptedKey, &keyToReceive.GetData()[8], 256);
+    memcpy(cryptedKey, &keyToReceiveData[8], 256);
 
     RSA_private_decrypt(256, cryptedKey, key, keyPair, RSA_PKCS1_OAEP_PADDING);
 

@@ -4,8 +4,8 @@ using namespace sf;
 
 namespace ssf {
 
-Socket::Status SecureTcpListener::Accept(SecureTcpSocket& Connected) {
-  Socket::Status s = TcpListener::Accept(Connected);
+Socket::Status SecureTcpListener::accept(SecureTcpSocket& Connected) {
+  Socket::Status s = TcpListener::accept(Connected);
   if(s == Socket::Done)
     Connected.InitServerSide();
 

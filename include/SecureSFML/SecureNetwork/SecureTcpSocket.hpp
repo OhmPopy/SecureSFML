@@ -37,7 +37,7 @@ public:
 
     }
     
-    sf::Socket::Status Connect(const sf::IpAddress& HostAddress, short unsigned int Port, sf::Uint32 timeout = 0);
+    sf::Socket::Status connect(const sf::IpAddress& HostAddress, short unsigned int Port, sf::Time timeout = sf::seconds(0));
 
     /**
      * Creates a new secure packet that will use the cipher of this secure socket for encryption/decryption

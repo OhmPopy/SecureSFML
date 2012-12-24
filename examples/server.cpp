@@ -10,8 +10,8 @@ int main(int argc, char* argv[]) {
     SecureTcpListener listener;
 
     SocketSelector selector;
-    listener.Listen(1234);
-    selector.Add(listener);
+    listener.listen(1234);
+    selector.add(listener);
     // Create a list to store the future clients
     list<SecureTcpSocket*> clients;
 
@@ -19,22 +19,22 @@ int main(int argc, char* argv[]) {
     while (true)
       {
         // Make the selector wait for data on any socket
-        if (selector.Wait())
+        if (selector.wait())
           {
             // Test the listener
-            if (selector.IsReady(listener))
+            if (selector.isReady(listener))
               {
                 // The listener is ready: there is a pending connection
                 // Use an AES-256 cipher for encrypting the data
                 SecureTcpSocket* client = new SecureTcpSocket(new AESCipher(32));
-                if (listener.Accept(*client) == Socket::Done)
+                if (listener.accept(*client) == Socket::Done)
                   {
                     // Add the new client to the clients list
                     clients.push_back(client);
 
                     // Add the new client to the selector so that we will
                     // be notified when he sends something
-                    selector.Add(*client);
+                    selector.add(*client);
                   }
               }
             else
@@ -43,11 +43,11 @@ int main(int argc, char* argv[]) {
                 for (list<SecureTcpSocket*>::iterator it = clients.begin(); it != clients.end(); ++it)
                   {
                     SecureTcpSocket& client = **it;
-                    if (selector.IsReady(client))
+                    if (selector.isReady(client))
                       {
                         // The client has sent some data, we can receive it
                         SecurePacket packet = client.getNewSecurePacket();
-                        if (client.Receive(packet) == Socket::Done)
+                        if (client.receive(packet) == Socket::Done)
                           {
                             string s;
                             packet >> s;

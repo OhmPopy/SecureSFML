@@ -13,9 +13,9 @@ namespace ssf {
 
 public:
 
-    virtual const char* OnSend(std::size_t& DataSize);
+    virtual const void * 	onSend (std::size_t &size);
 
-    virtual void OnReceive(const char* Data, std::size_t DataSize);
+    virtual void 	onReceive (const void *data, std::size_t size);
     
 private:
 

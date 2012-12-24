@@ -6,11 +6,11 @@
 
 namespace ssf {
 
-  class SecureTcpListener : public sf::TcpListener {
+class SecureTcpListener : public sf::TcpListener {
 
 public:
  
-    Socket::Status Accept(SecureTcpSocket& Connected);
+    Socket::Status accept(SecureTcpSocket& Connected);
 
 };
 

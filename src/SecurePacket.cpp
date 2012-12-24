@@ -3,11 +3,11 @@
 
 namespace ssf {
 
-const char* SecurePacket::OnSend(std::size_t& DataSize) {
-    char* myBuffer = new char[GetDataSize()];
-    memcpy(myBuffer, GetData(), GetDataSize());
+const void* SecurePacket::onSend(std::size_t& DataSize) {
+    char* myBuffer = new char[getDataSize()];
+    memcpy(myBuffer, getData(), getDataSize());
 
-    int size = GetDataSize();
+    int size = getDataSize();
     char* cryptedBuffer = myCipher->encrypt(myBuffer, size);
     DataSize = size;
     
@@ -16,10 +16,10 @@ const char* SecurePacket::OnSend(std::size_t& DataSize) {
     return cryptedBuffer;
 }
 
-void SecurePacket::OnReceive(const char* Data, std::size_t DataSize) {
-    char* decryptedBuffer = myCipher->decrypt(Data, DataSize);
+void SecurePacket::onReceive (const void *data, std::size_t size) {
+    char* decryptedBuffer = myCipher->decrypt((const char*)data, size);
 
-    Append(decryptedBuffer, DataSize);
+    append(decryptedBuffer, size);
 }
 
 } // namespace ssf
