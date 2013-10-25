@@ -7,6 +7,11 @@ namespace ssf {
 
 class RC4Cipher : public Cipher {
 
+private:
+
+   unsigned char _ivDecrypt[16];
+   unsigned char _keyDecrypt[16];
+
 public:
 
     /**
@@ -16,8 +21,11 @@ public:
      * @param keyLength the length of the key, in bytes (16 Bytes minimum recommended for safety)
      * @param key (optionnal) a custom key you made
      */
-    RC4Cipher(int keyLength = 16, unsigned char* key = 0) : Cipher(keyLength, key) {
+    RC4Cipher(int keyLength = 16, unsigned char* key = 0, unsigned char* iv = 0) : Cipher(keyLength, key, iv) {
       _cipherType = CIPHER_RC4;
+      
+      memcpy(_keyDecrypt, _key, 16);
+      memcpy(_ivDecrypt, _iv, 16);
     }
 
     /**

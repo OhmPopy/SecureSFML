@@ -1,4 +1,4 @@
-#include "SecureSFML/SecureNetwork/SecureTcpListener.hpp"
+#include "SecureTcpListener.hpp"
 
 using namespace sf;
 

@@ -51,7 +51,6 @@ private:
     RSA* keyPair;
     Cipher* myCipher;
 
-    BIGNUM* receiveBigNum(int sixtyFourBits, sf::Packet& data);
     void InitServerSide();
     void InitClientSide();
 

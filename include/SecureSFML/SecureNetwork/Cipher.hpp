@@ -2,6 +2,7 @@
 #define __H_CIPHER
 
 #include <openssl/rand.h>
+#include <string.h>
 
 namespace ssf {
 
@@ -17,7 +18,8 @@ class Cipher {
 
 protected:
     int _keyLength;
-    unsigned char * _key;
+    unsigned char _key[32];
+    unsigned char _iv[16];
     CipherType _cipherType;
 
 public:
@@ -28,15 +30,18 @@ public:
      * @param keyLength the length of the key, in bytes
      * @param key (optionnal) a custom key you made
      */
-    Cipher(int keyLength, unsigned char* key = 0) : _keyLength(keyLength), _key(key) {
+    Cipher(int keyLength, unsigned char* key = 0, unsigned char* iv = 0) : _keyLength(keyLength) {
         if(key == 0) {
-            _key = new unsigned char[keyLength];
             RAND_bytes(_key, keyLength);
+            RAND_bytes(_iv, 16);
+            return;
         }
+        
+        memcpy(_key, key, 32);
+        memcpy(_iv, iv, 16);
     }
     
     virtual ~Cipher() {
-        delete _key;
     }
 
     /**
@@ -66,6 +71,7 @@ public:
      * Returns the symmetric key of the cipher
      */
     const unsigned char* getKey() { return _key; }
+    const unsigned char* getIv() { return _iv; }
 
 };
 

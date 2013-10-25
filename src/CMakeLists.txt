@@ -1,4 +1,4 @@
-include_directories(../include)
+include_directories(../include ../include/SecureSFML/SecureNetwork)
 
 add_library(secure-sfml SHARED SecureTcpSocket.cpp SecurePacket.cpp RC4Cipher.cpp AESCipher.cpp SecureTcpListener.cpp)
 target_link_libraries(secure-sfml crypto sfml-system sfml-network)

@@ -5,7 +5,7 @@ SET(CMAKE_BUILD_TYPE Release)
 
 add_subdirectory (src)
 
-include_directories(include)
+include_directories(include include/SecureSFML/SecureNetwork)
 
 add_executable (Server examples/server.cpp)
 add_executable (Client examples/client.cpp)

@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
             if (selector.isReady(listener))
               {
                 // The listener is ready: there is a pending connection
-                // Use an AES-256 cipher for encrypting the data
+                // Use an AES-CBC-256 cipher for encrypting the data
                 SecureTcpSocket* client = new SecureTcpSocket(new AESCipher(32));
                 if (listener.accept(*client) == Socket::Done)
                   {

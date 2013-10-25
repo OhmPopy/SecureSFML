@@ -16,7 +16,7 @@ public:
      * @param keyLength the length of the key, in bytes (16, 24 or 32 only)
      * @param key (optionnal) a custom key you made
      */
-    AESCipher(int keyLength, unsigned char* key = 0) : Cipher(keyLength, key) {
+    AESCipher(int keyLength, unsigned char* key = 0, unsigned char* iv = 0) : Cipher(keyLength, key, iv) {
       if(keyLength != 16 && keyLength != 24 && keyLength != 32)
         std::cerr << "Error : AES key length can be only 16/24/32 bytes" << std::endl;
       

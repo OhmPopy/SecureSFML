@@ -1,8 +1,10 @@
-#include "SecureSFML/SecureNetwork/SecureTcpSocket.hpp"
-#include "SecureSFML/SecureNetwork/RC4Cipher.hpp"
-#include "SecureSFML/SecureNetwork/AESCipher.hpp"
+#include "SecureTcpSocket.hpp"
+#include "RC4Cipher.hpp"
+#include "AESCipher.hpp"
 #include <iostream>
 #include <string.h>
+
+#include <openssl/pem.h>
 
 using namespace std;
 using namespace sf;
@@ -19,68 +21,34 @@ Socket::Status SecureTcpSocket::connect(const IpAddress& HostAddress, short unsi
 
 }
 
-BIGNUM* SecureTcpSocket::receiveBigNum(int sixtyFourBits, Packet& data) {
-    BIGNUM* bn = new BIGNUM;
-    data >> bn->dmax;
-    data >> bn->top;
-
-    #ifdef THIRTY_TWO_BIT
-    if(sixtyFourBits) {
-      bn->dmax *= 2;
-      bn->top *= 2;
-    } 
-    #endif
-
-    data >> bn->neg;
-    data >> bn->flags;
-    bn->d = new BN_ULONG[bn->dmax];
-    for(int i = 0; i < bn->dmax; ++i) {
-      #if defined(SIXTY_FOUR_BIT_LONG) || defined (SIXTY_FOUR_BIT)
-        BN_ULONG d;
-        unsigned int firstPart;
-        unsigned int secondPart;
-        data >> firstPart;
-        d = firstPart;
-        d = d << 32;
-        data >> secondPart;
-        d += secondPart;
-        bn->d[i] = d;
-      #else
-        data >> bn->d[i];
-      #endif
-    }
-
-    return bn;
-}
-
 void SecureTcpSocket::InitServerSide() {
-
     /* default to RC4-128 when no cipher is set */
-    if(!myCipher)
-        myCipher = new RC4Cipher;
+   if(!myCipher)
+      myCipher = new RC4Cipher;
 
-    Packet data;
-    receive(data);
+   Packet data;
+   receive(data);
 
-    int sixtyFourBits;
+	BIO* cbio = BIO_new_mem_buf((void*)data.getData(), data.getDataSize());
+	PEM_read_bio_RSAPublicKey(cbio, &keyPair, NULL, NULL);
+	BIO_free_all(cbio);
 
-    keyPair = RSA_new();
+   unsigned char* cryptedCipherKey = new unsigned char[RSA_size(keyPair)];
+   RSA_public_encrypt(myCipher->getKeyLength(), myCipher->getKey(), cryptedCipherKey, keyPair, RSA_PKCS1_OAEP_PADDING);
 
-    data >> sixtyFourBits;
+   unsigned char cryptedIv[RSA_size(keyPair)];
+   RSA_public_encrypt(16, myCipher->getIv(), cryptedIv, keyPair, RSA_PKCS1_OAEP_PADDING);
 
-    keyPair->n = receiveBigNum(sixtyFourBits, data);
-    keyPair->e = receiveBigNum(sixtyFourBits, data);
+   Packet keyToSend;
 
-    unsigned char* cryptedCipherKey = new unsigned char[RSA_size(keyPair)];
-    RSA_public_encrypt(myCipher->getKeyLength(), myCipher->getKey(), cryptedCipherKey, keyPair, RSA_PKCS1_OAEP_PADDING);
+   keyToSend << myCipher->getKeyLength();
+   keyToSend << (int)myCipher->getCipherType();
+   keyToSend.append(cryptedCipherKey, RSA_size(keyPair));
+   keyToSend.append(cryptedIv, RSA_size(keyPair));
 
-    Packet keyToSend;
+   send(keyToSend);
 
-    keyToSend << myCipher->getKeyLength();
-    keyToSend << (int)myCipher->getCipherType();
-    keyToSend.append(cryptedCipherKey, RSA_size(keyPair));
-    
-    send(keyToSend);
+   delete[] cryptedCipherKey;
 }
 
 void SecureTcpSocket::InitClientSide() {
@@ -90,35 +58,17 @@ void SecureTcpSocket::InitClientSide() {
       delete myCipher;
 
     sf::Packet data;
-
-    #ifdef SIXTY_FOUR_BIT_LONG
-    data << 1;
-    #else
-    data << 0;
-    #endif
-
-    data << keyPair->n->dmax;
-    data << keyPair->n->top;
-    data << keyPair->n->neg;
-    data << keyPair->n->flags;
-    for(int i = 0; i < keyPair->n->dmax; ++i) {
-        #ifdef SIXTY_FOUR_BIT_LONG
-        data << static_cast<unsigned int>(keyPair->n->d[i] >> 32);
-        #endif
-        data << static_cast<unsigned int>(keyPair->n->d[i]);
-    }
-
-    data << keyPair->e->dmax;
-    data << keyPair->e->top;
-    data << keyPair->e->neg;
-    data << keyPair->e->flags;
-    for(int i = 0; i < keyPair->e->dmax; ++i) {
-        #ifdef SIXTY_FOUR_BIT_LONG
-        data << static_cast<unsigned int>(keyPair->e->d[i] >> 32);
-        #endif
-        data << static_cast<unsigned int>(keyPair->e->d[i]);
-    }
     
+	BIO *mem = BIO_new(BIO_s_mem());
+    PEM_write_bio_RSAPublicKey(mem, keyPair);
+
+    unsigned char *rsaPem;
+    unsigned short size = static_cast<unsigned short>(BIO_get_mem_data(mem, &rsaPem));
+
+	data.append(rsaPem, size);
+
+	BIO_free_all(mem);
+
     send(data);
 
     sf::Packet keyToReceive;
@@ -130,27 +80,33 @@ void SecureTcpSocket::InitClientSide() {
     keyToReceive >> keyLength;
     keyToReceive >> cipherType;
 
-    unsigned char* cryptedKey = new unsigned char[256];
+    unsigned char cryptedKey[RSA_size(keyPair)];
+    unsigned char cryptedIv[RSA_size(keyPair)];
+    
     unsigned char* key = new unsigned char[keyLength];
+    unsigned char iv[16];
     
     const char* keyToReceiveData = (const char*)keyToReceive.getData();
 
-    memcpy(cryptedKey, &keyToReceiveData[8], 256);
+    memcpy(cryptedKey, &keyToReceiveData[8], RSA_size(keyPair));
+    memcpy(cryptedIv, &keyToReceiveData[8+RSA_size(keyPair)], RSA_size(keyPair));
 
-    RSA_private_decrypt(256, cryptedKey, key, keyPair, RSA_PKCS1_OAEP_PADDING);
+    RSA_private_decrypt(RSA_size(keyPair), cryptedKey, key, keyPair, RSA_PKCS1_OAEP_PADDING);
+    RSA_private_decrypt(RSA_size(keyPair), cryptedIv, iv, keyPair, RSA_PKCS1_OAEP_PADDING);
 
     switch(cipherType) {
     case CIPHER_RC4:
-      myCipher = new RC4Cipher(keyLength, key);
+      myCipher = new RC4Cipher(keyLength, key, iv);
       break;
     case CIPHER_AES:
-      myCipher = new AESCipher(keyLength, key);
+      myCipher = new AESCipher(keyLength, key, iv);
       break; 
     default:
       cerr << "Cipher inconnu !" << endl;
     }
+    
+    delete[] key;
 
-    delete cryptedKey;
 }
 
 SecurePacket SecureTcpSocket::getNewSecurePacket() {

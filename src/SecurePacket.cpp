@@ -1,4 +1,4 @@
-#include "SecureSFML/SecureNetwork/SecurePacket.hpp"
+#include "SecurePacket.hpp"
 #include <string.h>
 
 namespace ssf {
@@ -11,7 +11,7 @@ const void* SecurePacket::onSend(std::size_t& DataSize) {
     char* cryptedBuffer = myCipher->encrypt(myBuffer, size);
     DataSize = size;
     
-    delete myBuffer;
+    delete[] myBuffer;
 
     return cryptedBuffer;
 }
