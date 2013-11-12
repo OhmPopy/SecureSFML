@@ -1,11 +1,21 @@
 SecureSFML is an extension to the SFML library (http://www.sfml-dev.org) which allows you to use encrypted tcp connections.
 
-It is however not an official SFML module !
+It is not an official SFML module !
+
+BEWARE : it is not yet secure from Man In The Middle attacks : there's no authentication.
+It just sets up an encrypted channel.
+
+Supported Ciphers : 
+
+AES-128-CBC
+AES-192-CBC
+AES-256-CBC
+RC4 (with a patch that renews the keys on each packet using an IV)
 
 === How to install ===
 
-As a prerequisite, you shall have SFML installed on your system already.
-The OpenSSL lib is also necessary.
+As a prerequisite, you must have SFML 2.1 installed on your system already.
+The OpenSSL lib is also necessary. (Ubuntu : # apt-get install libssl-dev)
 
 == Linux ==
 
@@ -25,3 +35,4 @@ The associated shared library is called secure-sfml and should be linked using -
 == Windows ==
 
 Unfortunatly, there are no "easy" ways of installing this at the moment.
+You need to import the source files in Visual C++ for example and link with the OpenSSL libs (libeay32.lib, ssleay32.lib)
