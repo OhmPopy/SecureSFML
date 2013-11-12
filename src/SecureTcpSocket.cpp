@@ -30,13 +30,18 @@ void SecureTcpSocket::InitServerSide() {
    receive(data);
 
 	BIO* cbio = BIO_new_mem_buf((void*)data.getData(), data.getDataSize());
-	PEM_read_bio_RSAPublicKey(cbio, &keyPair, NULL, NULL);
-	BIO_free_all(cbio);
+	if(!PEM_read_bio_RSAPublicKey(cbio, &keyPair, NULL, NULL)) {
+        cerr << "Couldn't read public key sent by peer" << endl;
+        BIO_free_all(cbio);
+        return;
+    }
 
+
+   BIO_free_all(cbio);
    unsigned char* cryptedCipherKey = new unsigned char[RSA_size(keyPair)];
    RSA_public_encrypt(myCipher->getKeyLength(), myCipher->getKey(), cryptedCipherKey, keyPair, RSA_PKCS1_OAEP_PADDING);
 
-   unsigned char cryptedIv[RSA_size(keyPair)];
+   unsigned char* cryptedIv = new unsigned char[RSA_size(keyPair)];
    RSA_public_encrypt(16, myCipher->getIv(), cryptedIv, keyPair, RSA_PKCS1_OAEP_PADDING);
 
    Packet keyToSend;
@@ -49,6 +54,7 @@ void SecureTcpSocket::InitServerSide() {
    send(keyToSend);
 
    delete[] cryptedCipherKey;
+   delete[] cryptedIv;
 }
 
 void SecureTcpSocket::InitClientSide() {
@@ -80,8 +86,8 @@ void SecureTcpSocket::InitClientSide() {
     keyToReceive >> keyLength;
     keyToReceive >> cipherType;
 
-    unsigned char cryptedKey[RSA_size(keyPair)];
-    unsigned char cryptedIv[RSA_size(keyPair)];
+    unsigned char* cryptedKey = new unsigned char[RSA_size(keyPair)];
+    unsigned char* cryptedIv = new unsigned char[RSA_size(keyPair)];
     
     unsigned char* key = new unsigned char[keyLength];
     unsigned char iv[16];
@@ -106,6 +112,8 @@ void SecureTcpSocket::InitClientSide() {
     }
     
     delete[] key;
+	delete[] cryptedKey;
+	delete[] cryptedIv;
 
 }
 

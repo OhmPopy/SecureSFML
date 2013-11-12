@@ -3,6 +3,7 @@
 
 #include <openssl/rand.h>
 #include <string.h>
+#include <cstddef>
 
 namespace ssf {
 
@@ -37,7 +38,7 @@ public:
             return;
         }
         
-        memcpy(_key, key, 32);
+        memcpy(_key, key, keyLength);
         memcpy(_iv, iv, 16);
     }
     
@@ -50,7 +51,7 @@ public:
      * @param length the initial length of the data. It is modified and contains the new length at the end of the method
      * @return pointer to the encrypted data
      */
-    virtual char* encrypt(const char* Data, int& length) = 0;
+    virtual char* encrypt(const char* Data, std::size_t& length) = 0;
 
     /**
      * Decrypts data of a certain length
@@ -58,7 +59,7 @@ public:
      * @param length the size in bytes of the data
      * @return pointer to the decrypted data
      */
-    virtual char* decrypt(const char* Data, int length) = 0;
+    virtual char* decrypt(const char* Data, std::size_t& length) = 0;
 
     CipherType getCipherType() { return _cipherType; }
 
